@@ -1,6 +1,6 @@
 import { DebugService, LogLevel } from "set-piece";
 import { LegacyExtensionModel } from "hearthstone-extension-legacy";
-import { AppService } from "hearthstone-core";
+import { AppService } from "./service/app";
 
 export function main() {
     DebugService.level = LogLevel.WARN;
