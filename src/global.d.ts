@@ -1,4 +1,5 @@
-import { AppService, RootModel } from "hearthstone-core";
+import { RootModel } from "hearthstone-core";
+import { AppClient } from ".";
 
 declare module '*.scss' {
     const content: { [className: string]: string };
@@ -7,7 +8,7 @@ declare module '*.scss' {
 
 declare global {
     interface Window {
-        app: AppService | undefined;
+        app: AppClient | undefined;
         root: RootModel | undefined;
     }
 }
