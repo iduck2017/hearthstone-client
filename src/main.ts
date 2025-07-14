@@ -1,11 +1,11 @@
 import { DebugUtil, LogLevel } from "set-piece";
-import { LegacyExtensionModel } from "hearthstone-extension-legacy";
+// import { LegacyExtensionModel } from "hearthstone-extension-legacy";
 import { AppClient } from ".";
 
 export function main() {
     DebugUtil.level = LogLevel.WARN;
     AppClient.boot({
-        extensions: [ new LegacyExtensionModel({}) ],
+        extensions: [],
     });
     window.app = AppClient;
     window.root = AppClient.root;

@@ -1,5 +1,5 @@
-import { DebugUtil, LogLevel, RouteUtil } from "set-piece";
-import { RootModel, ExtensionModel as Extensions, PlayerModel, MageHeroModel, GameModel } from "hearthstone-core";
+import { DebugUtil, RouteUtil } from "set-piece";
+import { RootModel, ExtensionModel as Extensions, PlayerModel, GameModel, MageCardModel } from "hearthstone-core";
 
 export class AppClient {
     private static _view?: HTMLElement;
@@ -29,8 +29,8 @@ export class AppClient {
     public static async debug() {
         const game = new GameModel({
             child: {
-                playerA: new PlayerModel({ child: { hero: new MageHeroModel({}) } }),
-                playerB: new PlayerModel({ child: { hero: new MageHeroModel({}) } }),
+                playerA: new PlayerModel({ child: { hero: new MageCardModel({}) } }),
+                playerB: new PlayerModel({ child: { hero: new MageCardModel({}) } }),
             }
         })
         AppClient._root?.start(game);
