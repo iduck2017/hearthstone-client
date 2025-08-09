@@ -1,10 +1,10 @@
 import { DebugUtil, RouteUtil } from "set-piece";
-import { RootModel, ExtensionModel as Extensions, PlayerModel, GameModel, MageCardModel } from "hearthstone-core";
+import { AppModel, ExtensionModel as Extensions, PlayerModel, GameModel, MageModel } from "hearthstone-core";
 
 export class AppClient {
     private static _view?: HTMLElement;
     
-    private static _root?: RootModel;
+    private static _root?: AppModel;
     public static get root() {
         return AppClient._root;
     }
@@ -21,7 +21,7 @@ export class AppClient {
         extensions: Extensions[];
     }) {
         AppClient._extensions = props.extensions;
-        AppClient._root = new RootModel({});
+        AppClient._root = new AppModel({});
         RouteUtil.boot(AppClient._root);
     }
 
@@ -29,10 +29,10 @@ export class AppClient {
     public static async debug() {
         const game = new GameModel({
             child: {
-                playerA: new PlayerModel({ child: { hero: new MageCardModel({}) } }),
-                playerB: new PlayerModel({ child: { hero: new MageCardModel({}) } }),
+                playerA: new PlayerModel({ child: { hero: new MageModel({}) } }),
+                playerB: new PlayerModel({ child: { hero: new MageModel({}) } }),
             }
         })
-        AppClient._root?.start(game);
+        AppClient._root?.set(game);
     }
 }

@@ -3,12 +3,11 @@ import { DebugUtil, LogLevel } from "set-piece";
 import { AppClient } from ".";
 
 export function main() {
-    DebugUtil.level = LogLevel.WARN;
+    DebugUtil.level = LogLevel.INFO;
     AppClient.boot({
         extensions: [],
     });
-    window.app = AppClient;
-    window.root = AppClient.root;
+    window.app = AppClient.root;
     AppClient.debug()
 }
 main();
