@@ -41,7 +41,7 @@
   },
   "scripts": {
     "test": "jest",
-    "build": "webpack --mode production",
+    "build": "webpack",
     "serve": "webpack serve"
   }
 }
