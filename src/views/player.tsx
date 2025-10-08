@@ -17,9 +17,8 @@ export function PlayerView(props: {
     const attack = useModel(role?.child.attack);
 
     return <div className={`flex gap-2 w-[616px] items-center mb-4`}>
-        <h1 className="text-lg font-bold">
+        <h1 className={`text-lg font-bold ${props.current === props.player ? 'text-green-300' : ''}`}>
             {props.name}
-            {props.current === props.player && <span className="text-red-500">*</span>}
         </h1>
         <div className="flex">
             <span className="text-yellow-300">{attack?.state.current}</span>

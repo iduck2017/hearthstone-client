@@ -1,4 +1,4 @@
-import { CardModel } from "hearthstone-core";
+import { CardModel, RarityType } from "hearthstone-core";
 import { SpellCardView } from "./spell";
 import { MinionCardView } from "./minion";
 import { WeaponCardView } from "./weapon";
@@ -25,14 +25,16 @@ export function ICardView(props: {
     children?: React.ReactNode
     className?: string
 }) {
-    const { card } = props;
-    const cost = useModel(card?.child.cost);
+    const card = useModel(props.card);
+    const cost = useModel(props.card?.child.cost);
     return <Popover
-        content={card?.state.desc}
+        content={props.card?.state.desc}
     >
         <div className={`flex border-b-2 p-1 gap-1 items-center w-[300px] ${props.className}`}>
             <span className="text-blue-300">{cost?.state.current}</span> 
-            <span>{card?.state.name}</span>
+            <span className={`${card?.state.rarity === RarityType.LEGENDARY ? 'font-bold' : ''}`}>
+                {card?.state.name}
+            </span>
             {props.children}
         </div>
     </Popover>

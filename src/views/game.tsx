@@ -5,6 +5,7 @@ import { BoardView } from "./board";
 import { DeckView } from "./deck";
 import { HandView } from "./hand";
 import { PlayerView } from "./player";
+import { GraveyardView } from "./graveyard";
 
 export default function GameView(props: {
     game?: GameModel
@@ -25,6 +26,10 @@ export default function GameView(props: {
             <BoardView board={playerA?.child.board} />
             <BoardView board={playerB?.child.board} />
             <HandView hand={playerB?.child.hand} />
+        </div>
+        <div className="flex gap-4 flex-nowrap mb-4">
+            <GraveyardView graveyard={playerA?.child.graveyard} />
+            <GraveyardView graveyard={playerB?.child.graveyard} />
         </div>
         <div className="flex gap-4 flex-nowrap">
             <DeckView deck={playerA?.child.deck} />

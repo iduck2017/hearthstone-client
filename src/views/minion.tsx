@@ -30,7 +30,9 @@ export function MinionCardView(props: {
         <div className="flex items-center">
             <span className="text-yellow-300">{attack?.state.current}</span>
             <span className="text-gray-200 text-sm">/</span>
-            <span className="text-red-300">{health?.state.current}</span>
+            {health ? <span 
+                className={`${health?.state.current < health.state.maximum ? 'text-red-300' : 'text-green-300'}`}
+            >{health?.state.current}</span> : null}
         </div>
         <div className="flex gap-1 ml-auto mr-1">
             {cardFeats?.child.battlecry.length ? <span>🔥</span> : null}
