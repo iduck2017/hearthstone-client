@@ -13,7 +13,6 @@
     "experimentalDecorators": true,
     "strictFunctionTypes": false,
     "noUncheckedIndexedAccess": true,
-    "baseUrl": "."
   },
   "include": ["src/**/*"]
 }
