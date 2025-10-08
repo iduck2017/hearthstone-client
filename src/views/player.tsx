@@ -11,12 +11,21 @@ export function PlayerView(props: {
 }) {
     const player = useModel(props?.player);
     const mana = useModel(player?.child.mana);
+    const hero = useModel(player?.child.hero);
+    const role = useModel(hero?.child.role);
+    const health = useModel(role?.child.health);
+    const attack = useModel(role?.child.attack);
 
-    return <div className={`flex gap-2 w-[616px] items-center`}>
+    return <div className={`flex gap-2 w-[616px] items-center mb-4`}>
         <h1 className="text-lg font-bold">
             {props.name}
             {props.current === props.player && <span className="text-red-500">*</span>}
         </h1>
+        <div className="flex">
+            <span className="text-yellow-300">{attack?.state.current}</span>
+            <span className="text-gray-200 text-sm">/</span>
+            <span className="text-red-300">{health?.state.current}</span>
+        </div>
         <span className="text-blue-500">{mana?.state.current}/{mana?.state.origin}</span>
     </div>
 }   

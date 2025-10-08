@@ -13,7 +13,6 @@ export function CommandView(props: {
         if (!turn) return;
         const current = turn.refer.current;
         if (!current) return;
-        console.log(current.command);
         setCommand(current.command);
     }
 
@@ -23,11 +22,15 @@ export function CommandView(props: {
 
     return <div>
         <h1 className="text-2xl font-bold mb-2">Commands</h1>
+        <div className="font-bold mb-2">Current: {turn?.refer.current === game?.child.playerA ? "PlayerA" : "PlayerB"}</div>
         {command.map((item, index) => (
             <div 
                 key={index} 
-                className="text-blue-500 hover:underline cursor-pointer"
-                onClick={() => item.handler()}
+                className="text-blue-500 hover:underline cursor-pointer mb-1"
+                onClick={() => {
+                    item.handler();
+                    setTimeout(() => refresh());
+                }}
             >
                 {item.title}
             </div>

@@ -12,10 +12,11 @@ export default function AppView(props: {
 
     const generate = () => {
         const cards: CardModel[] = [];
-        const size = LibraryUtil.registry.length;
+        const library = LibraryUtil.registry.filter(item => item.state.isCollectible);
+        const size = library.length;
         for (let count = 0; count < 30; count ++) {
             const index = Math.floor(Math.random() * size);
-            const card = LibraryUtil.registry[index];
+            const card = library[index];
             if (!card) continue;
             cards.push(card);
         }
@@ -72,7 +73,7 @@ export default function AppView(props: {
             {root.child.game ? 
                 <GameView game={root.child.game} /> : 
                 <div className="flex gap-4 items-center">
-                    {root.child.configs.map((item, index) => <ConfigView key={index} config={item} index={index} />)}
+                    {root.child.configs.map((item, index) => <ConfigView key={item.uuid} config={item} index={index} />)}
                 </div>
             }
         </div>

@@ -18,7 +18,7 @@ export function ConfigView(props: {
         </div>
         <div className="grid grid-cols-2 gap-1">
             {config?.child.cards.map((item, index) => (
-                <CardView key={index} card={item} index={index} />
+                <CardView key={item.uuid} card={item} index={index} />
             ))}
         </div>
     </div>
