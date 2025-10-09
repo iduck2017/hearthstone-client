@@ -23,14 +23,14 @@ export function CommandView(props: {
     return <div>
         <h1 className="text-2xl font-bold mb-2">Commands</h1>
         <div className="font-bold mb-2 flex gap-2">
-            <span className={`${turn?.refer.current === game?.child.playerA ? 'text-green-300' : ''}`}>PlayerA</span>
+            <span className={`${turn?.refer.current === game?.child.playerA ? 'text-green-300 underline' : ''}`}>PlayerA</span>
             <span className="text-gray-300 font-normal text-sm">/</span>
-            <span className={`${turn?.refer.current === game?.child.playerB ? 'text-green-300' : ''}`}>PlayerB</span>
+            <span className={`${turn?.refer.current === game?.child.playerB ? 'text-green-300 underline' : ''}`}>PlayerB</span>
         </div>
         {command.map((item, index) => (
             <div 
                 key={index} 
-                className="text-blue-500 hover:underline cursor-pointer mb-1"
+                className="text-blue-500 hover:underline cursor-pointer mb-1 select-none"
                 onClick={() => {
                     item.handler();
                     setTimeout(() => refresh());

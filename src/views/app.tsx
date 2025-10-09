@@ -1,9 +1,11 @@
-import { AppModel, CardModel, ConfigModel, GameModel, LibraryUtil, MageModel, MinionCardModel, PlayerModel, SpellCardModel, WeaponCardModel } from "hearthstone-core";
+import { AppModel, CardModel, ConfigModel, GameModel, LibraryUtil, MageModel, MinionCardModel, PlayerModel, RoleAttackModel, RoleHealthModel, RoleModel, SpellCardModel, WeaponCardModel } from "hearthstone-core";
 import React, { useEffect } from "react";
 import GameView from "./game";
 import { useModel } from "../hooks/use-model";
 import { ConfigView } from "./config";
 import { CommandView } from "./command";
+import { useSSE } from "../hooks/use-sse";
+import { AIView } from "./ai";
 
 export default function AppView(props: {
     root: AppModel
@@ -31,7 +33,7 @@ export default function AppView(props: {
         props.root.set(config);
     }
 
-    const start = () => {
+    const init = () => {
         const configA = generate();
         const configB = generate();
         const game = new GameModel(() => ({
@@ -44,18 +46,32 @@ export default function AppView(props: {
                 })),
                 playerB: new PlayerModel(() => ({
                     child: { 
-                        hero: new MageModel(),
+                        hero: new MageModel(() => ({
+                            child: {
+                                role: new RoleModel(() => ({
+                                    child: {
+                                        health: new RoleHealthModel(() => ({
+                                            state: { origin: 30 }
+                                        })),
+                                        attack: new RoleAttackModel(() => ({
+                                            state: { origin: 0 }
+                                        })),
+                                    }
+                                })),
+                            }
+                        })),
                         deck: configB.use(),
                     }
                 })),
             }
         }))
         props.root.set(game);
+        console.log(game.child.playerA.child.deck.refer.order);
         game.child.turn.next();
     }
 
     useEffect(() => {
-        start();
+        init();
     }, []);
 
     if (!root) return null;
@@ -67,9 +83,8 @@ export default function AppView(props: {
             <div className="flex gap-4 items-center p-4">
                 <h1 className="text-2xl font-bold">Hearthstone</h1>
                 <span className="text-sm">{root.state.version}</span>
-                {/* <button onClick={generate} className="text-blue-500 underline">generate</button>
-                <button onClick={generate} className="text-blue-500 underline">start</button> */}
             </div>
+            <AIView />
             {root.child.game ? 
                 <GameView game={root.child.game} /> : 
                 <div className="flex gap-4 items-center">
