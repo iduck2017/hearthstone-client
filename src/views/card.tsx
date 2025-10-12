@@ -30,7 +30,10 @@ export function ICardView(props: {
     return <Popover
         content={props.card?.state.desc}
     >
-        <div className={`flex border-b-2 p-1 gap-1 items-center w-[300px] ${props.className}`}>
+        <div 
+            onClick={() => console.log(props.card)}
+            className={`flex border-b-2 p-1 gap-1 items-center w-[300px] ${props.className}`}
+        >
             <span className="text-blue-300">{cost?.state.current}</span> 
             <span className={`${card?.state.rarity === RarityType.LEGENDARY ? 'font-bold' : ''}`}>
                 {card?.state.name}

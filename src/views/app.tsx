@@ -1,9 +1,10 @@
-import { AppModel, CardModel, CollectionModel, GameModel, LibraryUtil, MageModel, PlayerModel } from "hearthstone-core";
+import { AppModel, CardModel, CollectionModel, GameModel, HandModel, LibraryUtil, MageModel, PlayerModel } from "hearthstone-core";
 import React, { useEffect } from "react";
 import GameView from "./game";
 import { useModel } from "../hooks/use-model";
-import { CollectionView } from "./config";
+import { CollectionView } from "./collection";
 import { OptionView } from "./option";
+import { IceLanceModel, WispModel } from "hearthstone-extension-legacy";
 
 export default function AppView(props: {
     root: AppModel
@@ -11,7 +12,8 @@ export default function AppView(props: {
     const root = useModel(props.root);
 
     const generate = () => {
-        const cards: CardModel[] = [];
+        const cards: CardModel[] = [
+        ];
         const library = LibraryUtil.registry.filter(item => item.state.isCollectible);
         const size = library.length;
         for (let count = 0; count < 30; count ++) {
@@ -37,12 +39,23 @@ export default function AppView(props: {
                 playerA: new PlayerModel({
                     child: { 
                         hero: new MageModel(),
+                        hand: new HandModel({
+                            child: {
+                                minions: [new WispModel()],
+                                spells: [new IceLanceModel()],
+                            }
+                        }),
                         deck: configA.apply(),
                     }
                 }),
                 playerB: new PlayerModel({
                     child: { 
                         hero: new MageModel(),
+                        hand: new HandModel({
+                            child: {
+                                spells: [new IceLanceModel()],
+                            }
+                        }),
                         deck: configB.apply(),
                     }
                 }),

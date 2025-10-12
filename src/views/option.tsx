@@ -1,6 +1,7 @@
 import { Option, GameModel, AnimeUtil } from "hearthstone-core";
 import React, { useEffect, useState } from "react";
 import { useModel } from "../hooks/use-model";
+import { Popover } from "./popover";
 
 export function OptionView(props: {
     game?: GameModel
@@ -37,7 +38,12 @@ export function OptionView(props: {
                     setTimeout(() => refresh());
                 }}
             >
-                {item.title}
+                {item.desc ? 
+                    <Popover layout="right" content={item.desc}>
+                        {item.title}
+                    </Popover> : 
+                    item.title
+                }
             </div>
         ))}
     </div>

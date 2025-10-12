@@ -2,18 +2,23 @@ import { MinionCardModel } from "hearthstone-core";
 import React from "react";
 import { useModel } from "../hooks/use-model";
 import { ICardView } from "./card";
+import { WispModel } from "hearthstone-extension-legacy";
 
 export function MinionCardView(props: {
     card?: MinionCardModel
 }) {    
     const minion = useModel(props?.card);
-    const health = useModel(minion?.child.role.child.health);
-    const attack = useModel(minion?.child.role.child.attack);
     const role = useModel(minion?.child.role);
+    const health = useModel(role?.child.health);
+    const attack = useModel(role?.child.attack);
     const cardFeats = useModel(minion?.child.feats);
     const roleFeats = useModel(role?.child.feats);
     const divineShield = useModel(roleFeats?.child.divineShield);
     const taunt = useModel(roleFeats?.child.taunt);
+
+    const frozen = useModel(roleFeats?.child.frozen);
+
+
     const stealth = useModel(roleFeats?.child.stealth);
     const windfury = useModel(roleFeats?.child.windfury);
     const poisonous = useModel(cardFeats?.child.poisonous);
@@ -23,6 +28,7 @@ export function MinionCardView(props: {
         card={props.card}
         className={`
             ${divineShield?.state.isActive ? 'text-yellow-300' : ''}  
+            ${frozen?.state.isActive ? 'text-blue-300' : ''}
             ${stealth?.state.isActive ? 'text-gray-300' : ''}  
             ${role?.child.action.status ? 'text-green-300' : ''}  
         `}

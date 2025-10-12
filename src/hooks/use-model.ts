@@ -1,9 +1,15 @@
-import { AnimeUtil } from "hearthstone-core";
+import { AnimeUtil, FrozenModel, MinionCardModel } from "hearthstone-core";
+import { WispModel } from "hearthstone-extension-legacy";
 import { useEffect, useRef, useState } from "react";
 import { Event, EventUtil, Frame, Model } from "set-piece";
 
 export function useModel<M extends Model>(model?: M): Frame<M> | undefined {
-    const [frame, setFrame] = useState<Frame<M>>()
+    const [frame, setFrame] = useState<Frame<M> | undefined>(model ? {
+        state: model.state,
+        refer: model.refer,
+        route: model.route,
+        child: model.child
+    } : undefined)
     const tasks = useRef<Record<number, NodeJS.Timeout>>({})
 
     useEffect(() => {
