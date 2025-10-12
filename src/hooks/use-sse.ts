@@ -9,6 +9,7 @@ interface UseSSEOptions {
 
 interface UseSSEResult {
   content: string;
+  thinking: string;
   error: string | null;
   loading: boolean;
   start: (prompt: string) => Promise<void>;
@@ -18,6 +19,7 @@ interface UseSSEResult {
 
 export function useSSE(options: UseSSEOptions = {}): UseSSEResult {
   const [content, setContent] = useState('');
+  const [thinking, setThinking] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -26,6 +28,7 @@ export function useSSE(options: UseSSEOptions = {}): UseSSEResult {
     try {
       setLoading(true);
       setError(null);
+      setThinking('');
       setContent('');
       
       // 创建新的 AbortController
@@ -42,16 +45,23 @@ export function useSSE(options: UseSSEOptions = {}): UseSSEResult {
         // 禁用自动重连
         openWhenHidden: true,
         
-        onmessage(ev) {
+        onmessage(raw) {
           try {
-            const data = JSON.parse(ev.data);
-            console.log(data);
-            const chunk = data.content;
-            if (chunk) {
+            const chunk: {
+              content?: string;
+              thinking?: string;
+            } = JSON.parse(raw.data);
+            if (chunk.content) {
               setContent(prev => {
-                const newContent = prev + chunk;
-                options.onMessage?.(chunk);
+                const newContent = prev + chunk.content;
+                options.onMessage?.(chunk.content ?? '');
                 return newContent;
+              });
+            }
+            if (chunk.thinking) {
+              setThinking(prev => {
+                const newThinking = prev + chunk.thinking;
+                return newThinking;
               });
             }
           } catch (e) {
@@ -95,12 +105,14 @@ export function useSSE(options: UseSSEOptions = {}): UseSSEResult {
 
   const clear = useCallback(() => {
     setContent('');
+    setThinking('');
     setError(null);
     stop();
   }, [stop]);
 
   return {
     content,
+    thinking,
     loading,
     error,
     start,
