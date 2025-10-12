@@ -5,6 +5,7 @@ import { useModel } from "../hooks/use-model";
 import { CollectionView } from "./collection";
 import { OptionView } from "./option";
 import { IceLanceModel, WispModel } from "hearthstone-extension-legacy";
+import { AIView } from "./ai";
 
 export default function AppView(props: {
     root: AppModel
@@ -31,7 +32,7 @@ export default function AppView(props: {
         props.root.set(config);
     }
 
-    const start = () => {
+    const init = () => {
         const configA = generate();
         const configB = generate();
         const game = new GameModel({
@@ -66,7 +67,7 @@ export default function AppView(props: {
     }
 
     useEffect(() => {
-        start();
+        init();
     }, []);
 
     if (!root) return null;
@@ -78,9 +79,8 @@ export default function AppView(props: {
             <div className="flex gap-4 items-center p-4">
                 <h1 className="text-2xl font-bold">Hearthstone</h1>
                 <span className="text-sm">{root.state.version}</span>
-                {/* <button onClick={generate} className="text-blue-500 underline">generate</button>
-                <button onClick={generate} className="text-blue-500 underline">start</button> */}
             </div>
+            <AIView />
             {root.child.game ? 
                 <GameView game={root.child.game} /> : 
                 <div className="flex gap-4 items-center">
