@@ -1,4 +1,3 @@
-import { DebugUtil, LogLevel } from "set-piece";
 import { AppClient } from ".";
 import "hearthstone-extension-legacy";
 import "./index.css";

@@ -10,7 +10,7 @@ export function HandView(props: {
     const hand = useModel(props?.hand);
     return <div className="flex flex-col w-[300px]">
         <h1 className="text-lg font-bold mb-2">Hand</h1>
-        {hand?.refer.order.map((item, index) => (
+        {hand?.refer.queue.map((item, index) => (
             <CardView key={item.uuid} card={item} index={index} />
         ))}
     </div>

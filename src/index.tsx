@@ -26,16 +26,16 @@ export class AppClient {
 
     @DebugUtil.log()
     public static async debug() {
-        const game = new GameModel(() => ({
+        const game = new GameModel({
             child: {
-                playerA: new PlayerModel(() => ({
+                playerA: new PlayerModel({
                     child: { hero: new MageModel() }
-                })),
-                playerB: new PlayerModel(() => ({
+                }),
+                playerB: new PlayerModel({
                     child: { hero: new MageModel() }
-                })),
+                }),
             }
-        }))
+        })
         AppClient._root?.set(game);
     }
 }

@@ -1,5 +1,6 @@
+import { AnimeUtil } from "hearthstone-core";
 import { useEffect, useRef, useState } from "react";
-import { Event, Frame, FrameUtil, Model } from "set-piece";
+import { Event, EventUtil, Frame, Model } from "set-piece";
 
 export function useModel<M extends Model>(model?: M): Frame<M> | undefined {
     const [frame, setFrame] = useState<Frame<M>>()
@@ -13,10 +14,10 @@ export function useModel<M extends Model>(model?: M): Frame<M> | undefined {
             route: model.route,
             child: model.child
         })
-        return FrameUtil.bind(
-            model.proxy.event.onChange, 
+        return EventUtil.bind(
+            model.proxy.event?.onChange, 
             (that: M, event: Event<Frame<M>>) => {
-                const time = FrameUtil.time;
+                const time = AnimeUtil.current;
                 const frame: Frame<M> = {
                     state: that.state,
                     refer: that.refer,

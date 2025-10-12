@@ -1,11 +1,11 @@
-import { CommandUtil, GameModel } from "hearthstone-core";
+import { Option, GameModel, AnimeUtil } from "hearthstone-core";
 import React, { useEffect, useState } from "react";
 import { useModel } from "../hooks/use-model";
 
-export function CommandView(props: {
+export function OptionView(props: {
     game?: GameModel
 }) {
-    const [command, setCommand] = useState<CommandUtil[]>([]);
+    const [options, setOptions] = useState<Option[]>([]);
     const game = useModel(props.game);
     const turn = useModel(game?.child.turn);
 
@@ -13,7 +13,7 @@ export function CommandView(props: {
         if (!turn) return;
         const current = turn.refer.current;
         if (!current) return;
-        setCommand(current.command);
+        setOptions(current.options);
     }
 
     useEffect(() => {
@@ -27,11 +27,12 @@ export function CommandView(props: {
             <span className="text-gray-300 font-normal text-sm">/</span>
             <span className={`${turn?.refer.current === game?.child.playerB ? 'text-green-300' : ''}`}>PlayerB</span>
         </div>
-        {command.map((item, index) => (
+        {options.map((item, index) => (
             <div 
                 key={index} 
                 className="text-blue-500 hover:underline cursor-pointer mb-1"
                 onClick={() => {
+                    AnimeUtil.reset();
                     item.handler();
                     setTimeout(() => refresh());
                 }}

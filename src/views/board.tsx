@@ -10,7 +10,7 @@ export function BoardView(props: {
     const board = useModel(props?.board);
     return <div className="flex flex-col w-[300px]">
         <h1 className="text-lg font-bold mb-2">Board</h1>
-        {board?.refer.order.map((item, index) => (
+        {board?.refer.queue.map((item, index) => (
             <CardView key={item.uuid} card={item} index={index} />
         ))}
     </div>

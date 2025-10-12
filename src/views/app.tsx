@@ -1,9 +1,9 @@
-import { AppModel, CardModel, ConfigModel, GameModel, LibraryUtil, MageModel, MinionCardModel, PlayerModel, SpellCardModel, WeaponCardModel } from "hearthstone-core";
+import { AppModel, CardModel, CollectionModel, GameModel, LibraryUtil, MageModel, PlayerModel } from "hearthstone-core";
 import React, { useEffect } from "react";
 import GameView from "./game";
 import { useModel } from "../hooks/use-model";
-import { ConfigView } from "./config";
-import { CommandView } from "./command";
+import { CollectionView } from "./config";
+import { OptionView } from "./option";
 
 export default function AppView(props: {
     root: AppModel
@@ -20,9 +20,7 @@ export default function AppView(props: {
             if (!card) continue;
             cards.push(card);
         }
-        const config = new ConfigModel(() => ({
-            child: { cards }
-        }));
+        const config = new CollectionModel({ child: { cards }});
         return config;
     }
 
@@ -34,22 +32,22 @@ export default function AppView(props: {
     const start = () => {
         const configA = generate();
         const configB = generate();
-        const game = new GameModel(() => ({
+        const game = new GameModel({
             child: {
-                playerA: new PlayerModel(() => ({
+                playerA: new PlayerModel({
                     child: { 
                         hero: new MageModel(),
-                        deck: configA.use(),
+                        deck: configA.apply(),
                     }
-                })),
-                playerB: new PlayerModel(() => ({
+                }),
+                playerB: new PlayerModel({
                     child: { 
                         hero: new MageModel(),
-                        deck: configB.use(),
+                        deck: configB.apply(),
                     }
-                })),
+                }),
             }
-        }))
+        })
         props.root.set(game);
         game.child.turn.next();
     }
@@ -61,7 +59,7 @@ export default function AppView(props: {
     if (!root) return null;
     return <div className="flex h-screen overflow-hidden">
         <div className="p-4 w-[300px] min-w-[300px] max-w-[300px] bg-gray-100 border-r border-gray-300 flex-shrink-0">
-            <CommandView game={root.child.game} />
+            <OptionView game={root.child.game} />
         </div>
         <div className="overflow-auto">
             <div className="flex gap-4 items-center p-4">
@@ -73,7 +71,7 @@ export default function AppView(props: {
             {root.child.game ? 
                 <GameView game={root.child.game} /> : 
                 <div className="flex gap-4 items-center">
-                    {root.child.configs.map((item, index) => <ConfigView key={item.uuid} config={item} index={index} />)}
+                    {root.child.configs.map((item, index) => <CollectionView key={item.uuid} collection={item} index={index} />)}
                 </div>
             }
         </div>
