@@ -1,16 +1,16 @@
-import { AppModel, CardModel, CollectionModel, GameModel, HandModel, LibraryUtil, MageModel, PlayerModel, PlayerType } from "hearthstone-core";
+import { AppModel, BoardModel, CardModel, CollectionModel, GameModel, HandModel, LibraryUtil, MageModel, PlayerModel, PlayerType } from "hearthstone-core";
 import React, { useEffect } from "react";
 import GameView from "./game";
 import { useModel } from "../hooks/use-model";
 import { CollectionView } from "./collection";
 import { OptionView } from "./option";
-import { IceLanceModel, WispModel } from "hearthstone-extension-legacy";
+import { IceLanceModel, WispModel, ShieldbearerModel, EmperorCobraModel } from "hearthstone-extension-legacy";
 import { AIView } from "./ai";
 
 export default function AppView(props: {
-    root: AppModel
+    app: AppModel
 }) {
-    const root = useModel(props.root);
+    const app = useModel(props.app);
 
     const generate = () => {
         const cards: CardModel[] = [];
@@ -28,7 +28,7 @@ export default function AppView(props: {
 
     const set = () => {
         const config = generate();
-        props.root.set(config);
+        props.app.set(config);
     }
 
     const init = () => {
@@ -44,10 +44,16 @@ export default function AppView(props: {
                         hero: new MageModel(),
                         hand: new HandModel({
                             child: {
-                                minions: [new WispModel()],
+                                minions: [],
+                            }
+                        }),
+                        board: new BoardModel({
+                            child: {
+                                minions: [],
                             }
                         }),
                         deck: configA.apply(),
+                        collection: configA,
                     }
                 }),
                 playerB: new PlayerModel({
@@ -58,37 +64,43 @@ export default function AppView(props: {
                         hero: new MageModel(),
                         hand: new HandModel({
                             child: {
-                                spells: [new IceLanceModel()],
+                                spells: [],
+                            }
+                        }),
+                        board: new BoardModel({
+                            child: {
+                                minions: [],
                             }
                         }),
                         deck: configB.apply(),
+                        collection: configB,
                     }
                 }),
             }
         })
-        props.root.set(game);
-        game.child.turn.next();
+        props.app.set(game);
+        game.start();
     }
 
     useEffect(() => {
         init();
     }, []);
 
-    if (!root) return null;
+    if (!app) return null;
     return <div className="flex h-screen overflow-hidden">
         <div className="p-4 w-[300px] min-w-[300px] max-w-[300px] bg-gray-100 border-r border-gray-300 flex-shrink-0">
-            <OptionView game={root.child.game} />
+            <OptionView app={props.app} />
         </div>
         <div className="overflow-auto">
             <div className="flex gap-4 items-center p-4">
                 <h1 className="text-2xl font-bold">Hearthstone</h1>
-                <span className="text-sm">{root.state.version}</span>
+                <span className="text-sm">{app.state.version}</span>
             </div>
             <AIView />
-            {root.child.game ? 
-                <GameView game={root.child.game} /> : 
+            {app.child.game ? 
+                <GameView game={app.child.game} /> : 
                 <div className="flex gap-4 items-center">
-                    {root.child.configs.map((item, index) => <CollectionView key={item.uuid} collection={item} index={index} />)}
+                    {app.child.configs.map((item, index) => <CollectionView key={item.uuid} collection={item} index={index} />)}
                 </div>
             }
         </div>

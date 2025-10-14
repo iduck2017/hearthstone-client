@@ -1,69 +1,32 @@
-import { Option, GameModel, AnimeUtil, PlayerType } from "hearthstone-core";
-import React, { useEffect, useState } from "react";
+import { Option, GameModel, AnimeUtil, PlayerType, AppModel } from "hearthstone-core";
+import React, { useEffect, useRef, useState } from "react";
 import { useModel } from "../hooks/use-model";
 import { Popover } from "./popover";
 import { History, HistoryView } from "./history";
 import { Model } from "set-piece";
 
-export type Verbose = {
-    reason: string;
-    plan: string;
-    situation: string;
-    highlight: string;
-}
-
 export function OptionView(props: {
-    game?: GameModel
+    app?: AppModel
 }) {
     const [options, setOptions] = useState<Option[]>([]);
     const [history, setHistory] = useState<History[]>([]);
-    const game = props.game;
+    const plan = useRef<string[]>([]);
+
+    const app = props.app;
+    const game = app?.child.game;
     const turn = game?.child.turn;
     const current = turn?.refer.current;
     const isUser = current?.state.role === PlayerType.USER;
 
-    const snapshot = (model?: Model) => {
-        if (!model) return;
-        const result: any = {
-            uuid: model.uuid,
-            state: model.state,
-            child: {},
-            refer: {},
-        }
-        Object.keys(model.child).forEach(key => {
-            const value = Reflect.get(model.child, key);
-            if (!value) return;
-            if (value instanceof Array) result.child[key] = value.map(item => snapshot(item));
-            if (value instanceof Model) result.child[key] = snapshot(value);
-        })
-        Object.keys(model.refer).forEach(key => {
-            const value = Reflect.get(model.refer, key);
-            if (!value) return;
-            if (value instanceof Array) result.refer[key] = value.map(item => item.uuid);
-            if (value instanceof Model) result.refer[key] = value.uuid;
-        })
-        return result;
-    }
-
     const debug = () => {
-        console.log(
-            JSON.stringify(snapshot(game)), 
-            JSON.stringify(options.map(item => ({
-                code: item.code,
-                title: item.title,
-                desc: item.desc,
-            }))),
-            JSON.stringify(history),
-        )
+        console.log(game?.chunk);
     }
 
-    const execute = (option: Option, verbose?: Verbose) => {
+    const execute = (option: Option, reason?: string) => {
         setHistory(prev => [...prev, {
             title: option.title,
-            desc: option.desc,
             code: option.code,
-            reason: verbose?.reason,
-            plan: verbose?.plan,
+            reason: reason,
         }]);
         AnimeUtil.reset();
         option.handler();
@@ -79,38 +42,76 @@ export function OptionView(props: {
 
     useEffect(() => {
         if (!current) return;
+        if (!app?.child.game) return;
         if (!isUser) {
-            console.log('waiting for ai decision...');
-            const body: {
-                player: string,
-                snapshot: string,
-                history: string,
-                options: string,
-            } = {
-                player: current?.name,
-                snapshot: JSON.stringify(snapshot(game)),
-                history: JSON.stringify(history),
-                options: JSON.stringify(options),
-            };
-            fetch('http://localhost:8080/select-option', {
-                method: 'POST',
-                body: JSON.stringify(body),
-            })
-            .then(res => res.json())
-            .then((data: {
-                option: Option,
-                verbose: Verbose
-            }) => {
-                const code = data.option.code;
+            if (options.length === 1 && options[0]) {
+                // only one option, just execute it
+                execute(options[0]);
+                return;
+            }
+            if (plan.current.length > 0) {
+                const code = plan.current.shift();
                 const option = options.find(item => item.code === code);
                 if (!option) {
-                    console.error('option not found');
-                    return;
-                };
-                execute(option, data.verbose);
-            })
+                    console.log('invalid plan', code);
+                    plan.current = [];
+                    request(0);
+                } else {
+                    execute(option);
+                }
+            } else {
+                request(0);
+            }
         }
     }, [options])
+
+    const request = (retry: number) => {
+        console.log('waiting for ai decision...');
+        if (retry) console.log('retry times:', retry);
+        if (!current) return;
+        const body: {
+            player: string,
+            snapshot: string,
+            history: string,
+            options: string,
+        } = {
+            player: current?.name,
+            snapshot: JSON.stringify(game?.chunk),
+            history: JSON.stringify(history),
+            options: JSON.stringify(options),
+        };
+        fetch('http://localhost:8080/select-option', {
+            method: 'POST',
+            body: JSON.stringify(body),
+        })
+        .then(res => res.json())
+        .then((data: {
+            index?: number,
+            plan?: string[],
+            reason?: string,
+            error?: string,
+        }) => {
+            if (data.error) {
+                console.error('request error', data.error);
+                if (retry < 3) {
+                    request(retry + 1);
+                }
+                return;
+            } else {
+                const option = options[data.index ?? 0];
+                console.log(option?.title, data.plan)
+                if (!option) {
+                    console.error('option not found');
+                    if (retry < 3) {
+                        request(retry + 1);
+                    }
+                    return;
+                };
+                plan.current = [...(data.plan ?? [])];
+                execute(option, data.reason);
+            }
+        })
+    }
 
     useEffect(() => {
         refresh();
@@ -120,7 +121,6 @@ export function OptionView(props: {
         if (current) {
             setHistory(prev => [...prev, {
                 title: `${current.name}'s turn`,
-                desc: '',
                 code: '',
             }]);
         }

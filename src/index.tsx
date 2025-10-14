@@ -20,7 +20,7 @@ export class AppClient {
         const container = document.getElementById('root');
         if (container) {
             const reactRoot = createRoot(container);
-            reactRoot.render(<AppView root={AppClient._root} />);
+            reactRoot.render(<AppView app={AppClient._root} />);
         }
     }
 
