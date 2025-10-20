@@ -13,7 +13,6 @@ export class AppClient {
     }
     private constructor() {}
 
-    @DebugUtil.log()
     public static boot() {
         AppClient._root = new AppModel();
         
@@ -24,7 +23,6 @@ export class AppClient {
         }
     }
 
-    @DebugUtil.log()
     public static async debug() {
         const game = new GameModel({
             child: {

@@ -4,8 +4,10 @@ import GameView from "./game";
 import { useModel } from "../hooks/use-model";
 import { CollectionView } from "./collection";
 import { OptionView } from "./option";
-import { IceLanceModel, WispModel, ShieldbearerModel, EmperorCobraModel } from "hearthstone-extension-legacy";
+import { IceLanceModel, WispModel, ShieldbearerModel, EmperorCobraModel, ArcaneMissilesModel, SilenceModel, StonetuskBoarModel, EmeraldSkytalonModel } from "hearthstone-extension-legacy";
 import { AIView } from "./ai";
+import { HistoryView } from "./history";
+import { PlanView } from "./plan";
 
 export default function AppView(props: {
     app: AppModel
@@ -44,7 +46,8 @@ export default function AppView(props: {
                         hero: new MageModel(),
                         hand: new HandModel({
                             child: {
-                                minions: [],
+                                // minions: [new EmeraldSkytalonModel()],
+                                // spells: [new ArcaneMissilesModel(), ]
                             }
                         }),
                         board: new BoardModel({
@@ -58,7 +61,7 @@ export default function AppView(props: {
                 }),
                 playerB: new PlayerModel({
                     state: {
-                        role: PlayerType.AGENT,
+                        role: PlayerType.USER,
                     },
                     child: { 
                         hero: new MageModel(),
@@ -88,8 +91,10 @@ export default function AppView(props: {
 
     if (!app) return null;
     return <div className="flex h-screen overflow-hidden">
-        <div className="p-4 w-[300px] min-w-[300px] max-w-[300px] bg-gray-100 border-r border-gray-300 flex-shrink-0">
+        <div className="p-4 w-[300px] min-w-[300px] max-w-[300px] bg-gray-100 border-r border-gray-300 flex-shrink-0 overflow-y-auto">
             <OptionView app={props.app} />
+            <PlanView app={props.app} />
+            <HistoryView />
         </div>
         <div className="overflow-auto">
             <div className="flex gap-4 items-center p-4">

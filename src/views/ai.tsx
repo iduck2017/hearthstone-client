@@ -2,10 +2,12 @@ import { useSSE } from "../hooks/use-sse";
 import React, { useEffect } from "react";
 
 export function AIView() {
-    const { content, start, loading, thinking } = useSSE();   
+    const { content, start, loading, thinking } = useSSE({ 
+        api: 'http://localhost:8080/hello-ai' 
+    });   
 
     useEffect(() => {
-        // start('');
+        // start({});
     }, [])
 
     return <div className="mb-4 p-4">

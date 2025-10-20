@@ -2,6 +2,7 @@ import { useState, useCallback, useRef } from 'react';
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 
 interface UseSSEOptions {
+  api: string;
   onMessage?: (message: string) => void;
   onError?: (error: Error) => void;
   onComplete?: () => void;
@@ -12,19 +13,19 @@ interface UseSSEResult {
   thinking: string;
   error: string | null;
   loading: boolean;
-  start: (prompt: string) => Promise<void>;
+  start: (body: any) => Promise<void>;
   stop: () => void;
   clear: () => void;
 }
 
-export function useSSE(options: UseSSEOptions = {}): UseSSEResult {
+export function useSSE(options: UseSSEOptions): UseSSEResult {
   const [content, setContent] = useState('');
   const [thinking, setThinking] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  const start = useCallback(async (prompt: string) => {
+  const start = useCallback(async (body: any) => {
     try {
       setLoading(true);
       setError(null);
@@ -34,12 +35,12 @@ export function useSSE(options: UseSSEOptions = {}): UseSSEResult {
       // 创建新的 AbortController
       abortControllerRef.current = new AbortController();
       
-      await fetchEventSource('http://localhost:8080/hello-ai', {
+      await fetchEventSource(options.api, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ prompt }),
+        body: JSON.stringify(body),
         signal: abortControllerRef.current.signal,
         
         // 禁用自动重连

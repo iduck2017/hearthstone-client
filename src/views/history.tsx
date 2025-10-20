@@ -1,25 +1,24 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { DebugUtil } from "set-piece";
 
-export type History = {
-    title: string;
-    reason?: string;
-    code: string;
-}
+export function HistoryView() {
+    const [history, setHistory] = useState<string[]>([]);
 
-export function HistoryView(props: {
-    history?: History[]
-}) {
-    const debug = (item: History) => {
-        if (item.reason) console.log('reason', item.reason);
+    const refresh = () => {
+        setHistory(DebugUtil.stack.slice(-20));
     }
+    useEffect(() => {
+        window.addEventListener('click', () => {
+            setTimeout(() => refresh());
+        });
+        refresh();
+    }, []);
 
-    return <div className="h-full overflow-y-auto">
-        <h1 className="text-xl font-bold mb-2">History</h1>
+    return <div className="overflow-y-auto">
+        <h1 className="text-xl font-bold mb-2 cursor-pointer" onClick={() => refresh()}>History</h1>
         <div className="mb-4 text-sm">
-            {props.history?.slice(-20).map((item, index) => (
-                <div key={index} onClick={() => debug(item)}>
-                    <span>{index + 1}. {item.title}</span>
-                </div>
+            {history.map((item, index) => (
+                <div key={index}>{item}</div>
             ))}
         </div>
     </div>

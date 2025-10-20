@@ -1,15 +1,14 @@
-import { Option, GameModel, AnimeUtil, PlayerType, AppModel } from "hearthstone-core";
+import { GameModel, AnimeUtil, PlayerType, AppModel } from "hearthstone-core";
 import React, { useEffect, useRef, useState } from "react";
 import { useModel } from "../hooks/use-model";
 import { Popover } from "./popover";
-import { History, HistoryView } from "./history";
 import { Model } from "set-piece";
+import { useOption } from "../hooks/use-option";
 
 export function OptionView(props: {
     app?: AppModel
 }) {
-    const [options, setOptions] = useState<Option[]>([]);
-    const [history, setHistory] = useState<History[]>([]);
+    const { options, setOptions } = useOption(props.app?.child.game);
     const plan = useRef<string[]>([]);
 
     const app = props.app;
@@ -18,27 +17,6 @@ export function OptionView(props: {
     const current = turn?.refer.current;
     const isUser = current?.state.role === PlayerType.USER;
 
-    const debug = () => {
-        console.log(game?.chunk);
-    }
-
-    const execute = (option: Option, reason?: string) => {
-        setHistory(prev => [...prev, {
-            title: option.title,
-            code: option.code,
-            reason: reason,
-        }]);
-        AnimeUtil.reset();
-        option.handler();
-        setTimeout(() => refresh());
-    }
-
-    const refresh = () => {
-        if (!turn) return;
-        const current = turn.refer.current;
-        if (!current) return;
-        setOptions(current.options);
-    }
 
     useEffect(() => {
         if (!current) return;
@@ -46,7 +24,7 @@ export function OptionView(props: {
         if (!isUser) {
             if (options.length === 1 && options[0]) {
                 // only one option, just execute it
-                execute(options[0]);
+                options[0].handler();
                 return;
             }
             if (plan.current.length > 0) {
@@ -57,7 +35,7 @@ export function OptionView(props: {
                     plan.current = [];
                     request(0);
                 } else {
-                    execute(option);
+                    option.handler();
                 }
             } else {
                 request(0);
@@ -99,7 +77,6 @@ export function OptionView(props: {
                 return;
             } else {
                 const option = options[data.index ?? 0];
-                console.log(option?.title, data.plan)
                 if (!option) {
                     console.error('option not found');
                     if (retry < 3) {
@@ -108,27 +85,15 @@ export function OptionView(props: {
                     return;
                 };
                 plan.current = [...(data.plan ?? [])];
-                execute(option, data.reason);
+                option.handler();
             }
         })
     }
 
-    useEffect(() => {
-        refresh();
-    }, [turn]);
 
-    useEffect(() => {
-        if (current) {
-            setHistory(prev => [...prev, {
-                title: `${current.name}'s turn`,
-                code: '',
-            }]);
-        }
-    }, [current])
-
-    return <div className="h-screen flex flex-col">
+    return <div className="flex flex-col">
         <div className="flex-shrink-0">
-            <h1 className="text-xl font-bold mb-2" onClick={() => debug()}>Options</h1>
+            <h1 className="text-xl font-bold mb-2">Options</h1>
             <div className="font-bold mb-2 flex gap-2">
                 <span className={`${turn?.refer.current === game?.child.playerA ? 'text-green-300 underline' : ''}`}>PlayerA</span>
                 <span className="text-gray-300 font-normal text-sm">/</span>
@@ -144,14 +109,18 @@ export function OptionView(props: {
                         className={`mb-1 ${isUser ? 'text-blue-500 cursor-pointer hover:underline' : 'text-gray-300 cursor-not-allowed'}`}
                         onClick={() => {
                             if (!isUser) return;
-                            execute(item);
+                            item.handler();
                         }}
                     >
-                        <span className="select-none">{index + 1}. {item.title}</span>
+                        <Popover
+                            content={<div>{item.desc}</div>}
+                            layout="right"
+                        >
+                            <span className="select-none">{index + 1}. {item.hint}</span>
+                        </Popover>
                     </div>
                 ))}
             </div>
         </div>
-        <HistoryView history={history} />
     </div>
 }

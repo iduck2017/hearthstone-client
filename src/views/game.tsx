@@ -6,6 +6,7 @@ import { DeckView } from "./deck";
 import { HandView } from "./hand";
 import { PlayerView } from "./player";
 import { GraveyardView } from "./graveyard";
+import { AIView } from "./ai";
 
 export default function GameView(props: {
     game?: GameModel
@@ -14,9 +15,15 @@ export default function GameView(props: {
     const playerA = useModel(game?.child.playerA);
     const playerB = useModel(game?.child.playerB);
     const turn = useModel(game?.child.turn);
+    
+    const debug = () => {
+        console.log(props.game?.chunk);
+        console.log(playerA?.child.collection.chunk);
+        console.log(playerB?.child.collection.chunk);
+    }
 
     return <div className="p-4 w-max">
-        <h1 className="text-2xl font-bold mb-6">Game</h1>
+        <h1 className="text-2xl font-bold mb-6 cursor-pointer" onClick={() => debug()}>Game</h1>
         <div className="flex gap-4 flex-nowrap">
             <PlayerView player={game?.child.playerA} current={turn?.refer.current} name="PlayerA" />
             <PlayerView player={game?.child.playerB} current={turn?.refer.current} name="PlayerB" />
